@@ -4,6 +4,11 @@
     * Remove locale from baseline ping. ([1609968](https://bugzilla.mozilla.org/show_bug.cgi?id=1609968), [#1016](https://github.com/mozilla/glean/pull/1016))
     * Persist X-Debug-ID header on store ping. ([1605097](https://bugzilla.mozilla.org/show_bug.cgi?id=1605097), [#1042](https://github.com/mozilla/glean/pull/1042))
     * BUGFIX: raise an error if Glean is initialized with an empty string as the `application_id`.
+    * DEPRECATION: `getUploadEnabled` is deprecated (respectively `get_upload_enabled` in Python)
+        * Due to Glean's asynchronous initialization the return value can be incorrect.
+          Applications should not rely on Glean's internal state.
+          Upload enabled status should be tracked by the application and communicated to Glean if it changes.
+          Note: The method was removed from the C# implementation.
 * Python
     * BUGFIX: correctly set the `app_build` metric to the newly provided `application_build_id` initialization option.
     * The Python bindings now report networking errors in the `glean.upload.ping_upload_failure` metric (like all the other bindings).
