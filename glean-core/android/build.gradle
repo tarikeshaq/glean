@@ -17,6 +17,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'org.jetbrains.dokka-android'
 apply plugin: 'jacoco'
+apply plugin: 'com.google.protobuf'
 
 /*
  * This defines the location of the JSON schema used to validate the pings
@@ -65,6 +66,11 @@ android {
     }
 
     sourceSets {
+        main {
+            proto {
+                srcDir '../src'
+            }
+        }
         main.jniLibs.srcDirs += "$buildDir/nativeLibs/android"
         test.resources.srcDirs += "$buildDir/rustJniLibs/desktop"
         test.resources.srcDirs += "$buildDir/nativeLibs/desktop"
@@ -172,13 +178,35 @@ configurations {
     jnaForTest
 }
 
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.11.4'
+    }
+    plugins {
+        javalite {
+            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option "lite"
+                }
+            }
+        }
+    }
+}
+
 dependencies {
+    api "org.mozilla.components:concept-fetch:$versions.android_components"
     jnaForTest "net.java.dev.jna:jna:$versions.jna@jar"
     implementation "net.java.dev.jna:jna:$versions.jna@aar"
 
     // Note: the following version must be kept in sync
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines"
+    implementation 'com.google.protobuf:protobuf-javalite:3.11.4'
 
     implementation "androidx.annotation:annotation:$versions.androidx_annotation"
     implementation "androidx.lifecycle:lifecycle-extensions:$versions.androidx_lifecycle_extensions"

@@ -6,10 +6,7 @@
 
 package mozilla.telemetry.glean.rust
 
-import com.sun.jna.Library
-import com.sun.jna.Native
-import com.sun.jna.Pointer
-import com.sun.jna.StringArray
+import com.sun.jna.*
 import java.lang.reflect.Proxy
 import mozilla.telemetry.glean.config.FfiConfiguration
 import mozilla.telemetry.glean.net.FfiPingUploadTask
@@ -567,4 +564,21 @@ internal interface LibGleanFFI : Library {
     // Misc
 
     fun glean_str_free(ptr: Pointer)
+
+    // DO NOT MERGE ME PLEASE. THIS WAS ONLY ADDED FOR PROTOTYPING PURPOSES!!!
+    fun experiments_new(baseUrl: String, collectionsName: String, bucketName: String, dbPath: String, error: RustError.ByReference): Long
+
+    fun experiments_get_branch(handle: Long, branchName: String, error: RustError.ByReference): Pointer?
+
+    fun viaduct_destroy_bytebuffer(b: RustBuffer.ByValue)
+    // Returns null buffer to indicate failure
+    fun viaduct_alloc_bytebuffer(sz: Int): RustBuffer.ByValue
+    // Returns 0 to indicate redundant init.
+    fun viaduct_initialize(cb: RawFetchCallback): Byte
+
+    fun viaduct_log_error(s: String)
+}
+
+internal interface RawFetchCallback: Callback {
+    fun invoke(b: RustBuffer.ByValue): RustBuffer.ByValue
 }
